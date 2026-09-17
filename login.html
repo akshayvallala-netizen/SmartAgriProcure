@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
 <title>Farmer Login - SmartAgriProcure</title>
 
 <style>
@@ -28,6 +27,7 @@
 
     .login-container {
         width: 400px;
+        max-width: 85%;
         margin: 70px auto;
         background-color: white;
         padding: 35px;
@@ -88,6 +88,16 @@
         margin-top: 15px;
         font-weight: bold;
     }
+
+    .demo-info {
+        margin-top: 20px;
+        padding: 12px;
+        background-color: #f1f8e9;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 14px;
+        color: #33691e;
+    }
 </style>
 ```
 
@@ -107,14 +117,17 @@
     <form id="loginForm">
 
         <label for="mobile">Mobile Number</label>
+
         <input
             type="tel"
             id="mobile"
             placeholder="Enter mobile number"
+            maxlength="10"
             required
         >
 
         <label for="password">Password</label>
+
         <input
             type="password"
             id="password"
@@ -130,6 +143,12 @@
 
     <div class="message" id="message"></div>
 
+    <div class="demo-info">
+        <strong>Demo Login</strong><br><br>
+        Mobile: 9876543210<br>
+        Password: 123456
+    </div>
+
     <div class="register-link">
         New farmer?
         <a href="register.html">Register here</a>
@@ -139,7 +158,7 @@
 
 <script>
 
-    document.getElementById("loginForm").addEventListener("submit", async function(event) {
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
 
         event.preventDefault();
 
@@ -148,75 +167,36 @@
         const mobile = document.getElementById("mobile").value.trim();
         const password = document.getElementById("password").value;
 
-        message.innerHTML = "Logging in...";
+        // Demo login credentials
+        const demoMobile = "9876543210";
+        const demoPassword = "123456";
 
-        try {
+        // Check login
+        if (mobile === demoMobile && password === demoPassword) {
 
-            const response = await fetch(
-                "http://localhost:8080/api/farmers/login",
-                {
-                    method: "POST",
+            // Store demo farmer details
+            localStorage.setItem("farmerId", "1");
+            localStorage.setItem("farmerName", "Demo Farmer");
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            message.style.color = "green";
+            message.innerHTML = "Login successful!";
 
-                    body: JSON.stringify({
-                        mobile: mobile,
-                        password: password
-                    })
-                }
-            );
+            alert("Login successful! Welcome Demo Farmer");
 
-            if (response.ok) {
+            // Open farmer dashboard
+            window.location.href = "farmer/dashboard.html";
 
-                const data = await response.json();
+        } else {
 
-                if (data !== null) {
-
-                    // Save farmer ID for later dashboard features
-                    localStorage.setItem(
-                        "farmerId",
-                        data.farmerId
-                    );
-
-                    localStorage.setItem(
-                        "farmerName",
-                        data.name
-                    );
-
-                    alert("Login successful! Welcome " + data.name);
-
-                    window.location.href =
-                        "farmer/dashboard.html";
-
-                } else {
-
-                    message.innerHTML =
-                        "Invalid mobile number or password.";
-
-                }
-
-            } else {
-
-                message.innerHTML =
-                    "Login failed. Please try again.";
-
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
+            message.style.color = "red";
             message.innerHTML =
-                "Cannot connect to backend. Make sure Spring Boot is running.";
+                "Invalid mobile number or password.";
 
         }
 
     });
 
 </script>
-```
 
 </body>
 
