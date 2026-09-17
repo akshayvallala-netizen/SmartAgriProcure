@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+```
 <title>Farmer Login - SmartAgriProcure</title>
 
 <style>
@@ -105,99 +106,94 @@
 
 <body>
 
-```
 <header>
     <h1>🌾 SmartAgriProcure</h1>
 </header>
 
 <div class="login-container">
 
-    <h2>Farmer Login</h2>
+```
+<h2>Farmer Login</h2>
 
-    <form id="loginForm">
+<form id="loginForm">
 
-        <label for="mobile">Mobile Number</label>
+    <label for="mobile">Mobile Number</label>
 
-        <input
-            type="tel"
-            id="mobile"
-            placeholder="Enter mobile number"
-            maxlength="10"
-            required
-        >
+    <input
+        type="tel"
+        id="mobile"
+        placeholder="Enter mobile number"
+        maxlength="10"
+        required
+    >
 
-        <label for="password">Password</label>
+    <label for="password">Password</label>
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-            required
-        >
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter password"
+        required
+    >
 
-        <button type="submit">
-            Login
-        </button>
+    <button type="submit">
+        Login
+    </button>
 
-    </form>
+</form>
 
-    <div class="message" id="message"></div>
+<div class="message" id="message"></div>
 
-    <div class="demo-info">
-        <strong>Demo Login</strong><br><br>
-        Mobile: 9876543210<br>
-        Password: 123456
-    </div>
+<div class="demo-info">
+    <strong>Demo Login</strong><br><br>
+    Mobile: 9876543210<br>
+    Password: 123456
+</div>
 
-    <div class="register-link">
-        New farmer?
-        <a href="register.html">Register here</a>
-    </div>
+<div class="register-link">
+    New farmer?
+    <a href="register.html">Register here</a>
+</div>
+```
 
 </div>
 
 <script>
 
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
+document.getElementById("loginForm").addEventListener("submit", function(event) {
 
-        event.preventDefault();
+    event.preventDefault();
 
-        const message = document.getElementById("message");
+    const message = document.getElementById("message");
 
-        const mobile = document.getElementById("mobile").value.trim();
-        const password = document.getElementById("password").value;
+    const mobile = document.getElementById("mobile").value.trim();
+    const password = document.getElementById("password").value;
 
-        // Demo login credentials
-        const demoMobile = "9876543210";
-        const demoPassword = "123456";
+    const demoMobile = "9876543210";
+    const demoPassword = "123456";
 
-        // Check login
-        if (mobile === demoMobile && password === demoPassword) {
+    if (mobile === demoMobile && password === demoPassword) {
 
-            // Store demo farmer details
-            localStorage.setItem("farmerId", "1");
-            localStorage.setItem("farmerName", "Demo Farmer");
+        localStorage.setItem("farmerId", "1");
+        localStorage.setItem("farmerName", "Demo Farmer");
 
-            message.style.color = "green";
-            message.innerHTML = "Login successful!";
+        message.style.color = "green";
+        message.innerHTML = "Login successful!";
 
-            alert("Login successful! Welcome Demo Farmer");
+        alert("Login successful! Welcome Demo Farmer");
 
-            // Open farmer dashboard
-            window.location.href = "farmer/dashboard.html";
+        window.location.href = "farmer/dashboard.html";
 
-        } else {
+    } else {
 
-            message.style.color = "red";
-            message.innerHTML =
-                "Invalid mobile number or password.";
+        message.style.color = "red";
+        message.innerHTML = "Invalid mobile number or password.";
 
-        }
+    }
 
-    });
+});
 
 </script>
 
 </body>
-
 </html>
