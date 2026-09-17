@@ -1,0 +1,267 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmer Registration - SmartAgriProcure</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f3;
+        }
+
+        .header {
+            background: #2e7d32;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 550px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #256628;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🌾 SmartAgriProcure</h1>
+        <p>Smart Farmer Procurement Management System</p>
+    </div>
+
+    <div class="container">
+
+        <h2>Farmer Registration</h2>
+
+        <form id="registerForm">
+
+            <label for="name">Full Name</label>
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label for="mobile">Mobile Number</label>
+            <input
+                type="tel"
+                id="mobile"
+                placeholder="Enter mobile number"
+                maxlength="15"
+                required
+            >
+
+            <label for="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter email address"
+            >
+
+            <label for="village">Village</label>
+            <input
+                type="text"
+                id="village"
+                placeholder="Enter village name"
+                required
+            >
+
+            <label for="district">District</label>
+            <input
+                type="text"
+                id="district"
+                placeholder="Enter district"
+                required
+            >
+
+            <label for="state">State</label>
+            <input
+                type="text"
+                id="state"
+                placeholder="Enter state"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+                required
+            >
+
+            <button type="submit">
+                Register
+            </button>
+
+        </form>
+
+        <div class="message" id="message"></div>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="login.html">Login here</a>
+        </div>
+
+    </div>
+
+    <script>
+
+        document.getElementById("registerForm").addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const message = document.getElementById("message");
+
+            const farmer = {
+
+                name: document.getElementById("name").value.trim(),
+
+                mobile: document.getElementById("mobile").value.trim(),
+
+                email: document.getElementById("email").value.trim(),
+
+                village: document.getElementById("village").value.trim(),
+
+                district: document.getElementById("district").value.trim(),
+
+                state: document.getElementById("state").value.trim(),
+
+                password: document.getElementById("password").value
+
+            };
+
+            message.innerHTML = "Registering...";
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/farmers/register",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify(farmer)
+                    }
+                );
+
+                if (response.ok) {
+
+                    const data = await response.json();
+
+                    alert(
+                        "Registration successful!\n\nFarmer ID: "
+                        + data.farmerId
+                    );
+
+                    window.location.href = "login.html";
+
+                } else {
+
+                    const errorText = await response.text();
+
+                    console.error(errorText);
+
+                    message.innerHTML =
+                        "Registration failed. Please try again.";
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.innerHTML =
+                    "Cannot connect to backend. Make sure Spring Boot is running.";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
+```

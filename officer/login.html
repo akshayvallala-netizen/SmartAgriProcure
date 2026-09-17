@@ -1,0 +1,198 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Officer Login - SmartAgriProcure</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f8e9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background: white;
+            width: 350px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>🌾 SmartAgriProcure</h2>
+
+    <p class="subtitle">Officer Login</p>
+
+    <form id="loginForm">
+
+        <label>Mobile Number</label>
+        <input
+            type="text"
+            id="mobile"
+            placeholder="Enter mobile number"
+            required
+        >
+
+        <label>Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter password"
+            required
+        >
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <p id="message"></p>
+
+</div>
+
+<script>
+
+document.getElementById("loginForm").addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const mobile = document.getElementById("mobile").value;
+    const password = document.getElementById("password").value;
+
+    fetch("http://localhost:8080/api/officers/login", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            mobile: mobile,
+            password: password
+        })
+
+    })
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Login request failed");
+        }
+
+        return response.json();
+
+    })
+
+    .then(data => {
+
+        if (data && data.officerId) {
+
+            // Save officer information
+            localStorage.setItem("officerId", data.officerId);
+            localStorage.setItem("officerName", data.name);
+            localStorage.setItem("centerId", data.centerId);
+
+            document.getElementById("message").style.color = "green";
+
+            document.getElementById("message").innerText =
+                "Login successful! Opening dashboard...";
+
+            // IMPORTANT:
+            // officer-login.html is in the main folder.
+            // dashboard.html is inside the officer folder.
+            setTimeout(function() {
+
+                window.location.href = "dashboard.html";
+
+            }, 500);
+
+        } else {
+
+            document.getElementById("message").style.color = "red";
+
+            document.getElementById("message").innerText =
+                "Invalid mobile number or password.";
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        document.getElementById("message").style.color = "red";
+
+        document.getElementById("message").innerText =
+            "Cannot connect to server. Make sure Spring Boot is running.";
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
+```

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - SmartAgriProcure</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f3;
+            margin: 0;
+        }
+
+        header {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout {
+            background: white;
+            color: #2e7d32;
+        }
+
+        .container {
+            padding: 25px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #2e7d32;
+        }
+
+        .data {
+            margin-top: 10px;
+        }
+
+        @media(max-width: 800px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <h2>🌾 SmartAgriProcure - Admin</h2>
+
+    <button class="logout" onclick="logout()">
+        Logout
+    </button>
+
+</header>
+
+<div class="container">
+
+    <h1>Admin Dashboard 👨‍💼</h1>
+
+    <p id="welcome"></p>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>👨‍🌾 Farmers</h3>
+            <div id="farmers" class="data">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>👨‍💼 Officers</h3>
+            <div id="officers" class="data">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🏢 Procurement Centers</h3>
+            <div id="centers" class="data">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🌱 Crops</h3>
+            <div id="crops" class="data">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📅 Appointments</h3>
+            <div id="appointments" class="data">
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>💰 Payments</h3>
+            <div id="payments" class="data">
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const adminName = localStorage.getItem("adminName");
+
+document.getElementById("welcome").innerText =
+    "Welcome, " + (adminName || "Admin") + "!";
+
+function loadData(url, elementId, label) {
+
+    fetch(url)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            let html = "<strong>Total " + label + ": "
+                     + data.length + "</strong><hr>";
+
+            data.forEach(item => {
+
+                if (label === "Farmers") {
+                    html += `
+                        <p>
+                        <b>${item.name}</b><br>
+                        Mobile: ${item.mobile}<br>
+                        Village: ${item.village}<br>
+                        District: ${item.district}
+                        </p>
+                    `;
+                }
+
+                else if (label === "Officers") {
+                    html += `
+                        <p>
+                        <b>${item.name}</b><br>
+                        Mobile: ${item.mobile}<br>
+                        Center ID: ${item.centerId}
+                        </p>
+                    `;
+                }
+
+                else if (label === "Centers") {
+                    html += `
+                        <p>
+                        <b>${item.centerName}</b><br>
+                        Location: ${item.location}<br>
+                        Capacity: ${item.capacity}
+                        </p>
+                    `;
+                }
+
+                else if (label === "Crops") {
+                    html += `
+                        <p>
+                        <b>Crop ID: ${item.cropId}</b><br>
+                        Farmer ID: ${item.farmerId}<br>
+                        Crop: ${item.cropName}<br>
+                        Quantity: ${item.quantity} kg<br>
+                        Status: ${item.status}
+                        </p>
+                    `;
+                }
+
+                else if (label === "Appointments") {
+                    html += `
+                        <p>
+                        <b>Appointment ID: ${item.appointmentId}</b><br>
+                        Farmer ID: ${item.farmerId}<br>
+                        Date: ${item.appointmentDate}<br>
+                        Token: ${item.tokenNumber}<br>
+                        Status: ${item.status}
+                        </p>
+                    `;
+                }
+
+                else if (label === "Payments") {
+                    html += `
+                        <p>
+                        <b>Payment ID: ${item.paymentId}</b><br>
+                        Farmer ID: ${item.farmerId}<br>
+                        Amount: ₹${item.amount}<br>
+                        Status: ${item.status}
+                        </p>
+                    `;
+                }
+
+            });
+
+            document.getElementById(elementId).innerHTML = html;
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            document.getElementById(elementId).innerText =
+                "Unable to load data.";
+
+        });
+}
+
+
+// Load all dashboard data
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/farmers",
+    "farmers",
+    "Farmers"
+);
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/officers",
+    "officers",
+    "Officers"
+);
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/centers",
+    "centers",
+    "Centers"
+);
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/crops",
+    "crops",
+    "Crops"
+);
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/appointments",
+    "appointments",
+    "Appointments"
+);
+
+loadData(
+    "http://localhost:8080/api/admin/dashboard/payments",
+    "payments",
+    "Payments"
+);
+
+
+function logout() {
+
+    localStorage.removeItem("adminId");
+    localStorage.removeItem("adminName");
+
+    window.location.href = "../admin-login.html";
+}
+
+</script>
+
+</body>
+</html>

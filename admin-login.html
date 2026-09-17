@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - SmartAgriProcure</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>🌾 Admin Login</h2>
+
+    <input type="text" id="mobile" placeholder="Mobile Number">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="loginAdmin()">Login</button>
+
+    <p id="message"></p>
+
+</div>
+
+<script>
+
+function loginAdmin() {
+
+    const mobile = document.getElementById("mobile").value;
+    const password = document.getElementById("password").value;
+
+    fetch("http://localhost:8080/api/admins/login", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            mobile: mobile,
+            password: password
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data && data.adminId) {
+
+            localStorage.setItem("adminId", data.adminId);
+            localStorage.setItem("adminName", data.name);
+
+            window.location.href = "admin/dashboard.html";
+
+        } else {
+
+            document.getElementById("message").innerText =
+                "Invalid mobile number or password.";
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        document.getElementById("message").innerText =
+            "Unable to connect to server.";
+
+    });
+}
+
+</script>
+
+</body>
+</html>

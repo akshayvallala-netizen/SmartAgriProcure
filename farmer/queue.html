@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Queue Status - SmartAgriProcure</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f4;
+        }
+
+        header {
+            background: #2e7d32;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            text-align: center;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .number {
+            font-size: 35px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-top: 10px;
+        }
+
+        .ai-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f1f8e9;
+            border: 1px solid #c5e1a5;
+        }
+
+        .ai-number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-top: 10px;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back a {
+            color: #2e7d32;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        #message {
+            text-align: center;
+            margin: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h2 style="color:white; margin:0;">
+        🌾 SmartAgriProcure
+    </h2>
+
+    <a href="dashboard.html">
+        Dashboard
+    </a>
+
+</header>
+
+<div class="container">
+
+    <div class="box">
+
+        <h2>👥 Queue Status</h2>
+
+        <div id="message">
+            Loading queue...
+        </div>
+
+        <div id="queueData"></div>
+
+        <div class="back">
+            <a href="dashboard.html">
+                ← Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const farmerId = localStorage.getItem("farmerId");
+
+if (!farmerId) {
+
+    alert("Please login first.");
+
+    window.location.href = "../login.html";
+
+}
+
+async function loadQueue() {
+
+    try {
+
+        // Get farmer appointments
+        const response = await fetch(
+            "http://localhost:8080/api/appointments/farmer/" + farmerId
+        );
+
+        const appointments = await response.json();
+
+        const message = document.getElementById("message");
+        const queueData = document.getElementById("queueData");
+
+        if (appointments.length === 0) {
+
+            message.innerHTML = "No appointment found.";
+
+            return;
+
+        }
+
+        message.innerHTML = "";
+
+        queueData.innerHTML = "";
+
+        for (const appointment of appointments) {
+
+            // Get farmers ahead
+            const aheadResponse = await fetch(
+                "http://localhost:8080/api/queue/"
+                + appointment.appointmentId
+                + "/ahead"
+            );
+
+            // Get normal estimated waiting time
+            const waitResponse = await fetch(
+                "http://localhost:8080/api/queue/"
+                + appointment.appointmentId
+                + "/wait-time"
+            );
+
+            const ahead = await aheadResponse.json();
+
+            const waitTime = await waitResponse.json();
+
+            // Get AI predicted waiting time
+            const aiResponse = await fetch(
+                "http://localhost:8080/api/ai/queue/" + ahead
+            );
+
+            const aiPrediction = await aiResponse.json();
+
+            queueData.innerHTML += `
+
+                <div class="card">
+
+                    <p>
+                        <strong>Token Number</strong>
+                    </p>
+
+                    <div class="number">
+                        ${appointment.tokenNumber}
+                    </div>
+
+
+                    <p style="margin-top:20px;">
+                        Farmers Ahead
+                    </p>
+
+                    <div class="number">
+                        ${ahead}
+                    </div>
+
+
+                    <p style="margin-top:20px;">
+                        Estimated Waiting Time
+                    </p>
+
+                    <div class="number">
+                        ${waitTime} min
+                    </div>
+
+
+                    <div class="ai-box">
+
+                        <h3>
+                            🤖 AI Waiting Time Prediction
+                        </h3>
+
+                        <p style="margin-top:10px;">
+                            Based on the current queue
+                        </p>
+
+                        <div class="ai-number">
+                            ${aiPrediction} min
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("message").innerHTML =
+            "<span style='color:red;'>Unable to load queue.</span>";
+
+    }
+
+}
+
+loadQueue();
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>Register Crop - SmartAgriProcure</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f8f4;
+    }
+
+    header {
+        background-color: #2e7d32;
+        color: white;
+        padding: 18px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    header h2 {
+        font-size: 24px;
+    }
+
+    header a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .form-box {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .form-box h2 {
+        text-align: center;
+        color: #2e7d32;
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 7px;
+        font-weight: bold;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 25px;
+        padding: 13px;
+        background-color: #2e7d32;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #1b5e20;
+    }
+
+    .message {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    .back {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .back a {
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        color: #666;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<header>
+    <h2>🌾 SmartAgriProcure</h2>
+    <a href="dashboard.html">Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="form-box">
+
+        <h2>🌱 Register Your Crop</h2>
+
+        <form id="cropForm">
+
+            <label for="crop">Crop Name</label>
+
+            <select id="crop" required>
+                <option value="">-- Select Crop --</option>
+                <option value="Rice">Rice</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Maize">Maize</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Groundnut">Groundnut</option>
+                <option value="Sugarcane">Sugarcane</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="quantity">Quantity (in kg)</label>
+
+            <input
+                type="number"
+                id="quantity"
+                placeholder="Enter quantity"
+                min="1"
+                required
+            >
+
+            <label for="harvestDate">Harvest Date</label>
+
+            <input
+                type="date"
+                id="harvestDate"
+                required
+            >
+
+            <label for="center">Procurement Center</label>
+
+            <select id="center" required>
+
+                <option value="">-- Select Center --</option>
+
+                <option value="1">
+                    District Procurement Center
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Register Crop
+            </button>
+
+        </form>
+
+        <div class="message" id="message"></div>
+
+        <div class="back">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 SmartAgriProcure | Smart Farmer Procurement Management
+</footer>
+
+<script>
+
+    document.getElementById("cropForm").addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const message = document.getElementById("message");
+
+        // Get farmer ID saved during login
+        const farmerId = localStorage.getItem("farmerId");
+
+        if (!farmerId) {
+
+            alert("Please login first.");
+
+            window.location.href = "../login.html";
+
+            return;
+        }
+
+        const cropData = {
+
+            farmerId: parseInt(farmerId),
+
+            cropName: document.getElementById("crop").value,
+
+            quantity: parseFloat(
+                document.getElementById("quantity").value
+            ),
+
+            harvestDate:
+                document.getElementById("harvestDate").value,
+
+            centerId: parseInt(
+                document.getElementById("center").value
+            )
+
+        };
+
+        message.innerHTML = "Registering crop...";
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8080/api/crops",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(cropData)
+                }
+            );
+
+            if (response.ok) {
+
+                const data = await response.json();
+
+                alert(
+                    "Crop registered successfully!\n\n" +
+                    "Crop ID: " + data.cropId + "\n" +
+                    "Crop: " + data.cropName + "\n" +
+                    "Quantity: " + data.quantity + " kg"
+                );
+
+                window.location.href = "dashboard.html";
+
+            } else {
+
+                const errorText = await response.text();
+
+                console.error(errorText);
+
+                message.innerHTML =
+                    "Crop registration failed. Please try again.";
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.innerHTML =
+                "Cannot connect to backend. Make sure Spring Boot is running.";
+
+        }
+
+    });
+
+</script>
+```
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications - SmartAgriProcure</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f4;
+        }
+
+        header {
+            background: #2e7d32;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 25px;
+        }
+
+        .notification {
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9fff9;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .unread {
+            border-left: 5px solid #2e7d32;
+            background: #e8f5e9;
+        }
+
+        .date {
+            color: #777;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .read-button {
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #2e7d32;
+            color: white;
+            cursor: pointer;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #message {
+            text-align: center;
+            margin: 15px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h2 style="color:white; margin:0;">
+        🌾 SmartAgriProcure
+    </h2>
+
+    <a href="dashboard.html">
+        Dashboard
+    </a>
+
+</header>
+
+<div class="container">
+
+    <div class="box">
+
+        <h2>🔔 Notifications</h2>
+
+        <div id="message">
+            Loading notifications...
+        </div>
+
+        <div id="notifications"></div>
+
+        <div class="back">
+            <a href="dashboard.html">
+                ← Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const farmerId = localStorage.getItem("farmerId");
+
+if (!farmerId) {
+
+    alert("Please login first.");
+
+    window.location.href = "../login.html";
+
+}
+
+async function loadNotifications() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/api/notifications/farmer/" + farmerId
+        );
+
+        const notifications = await response.json();
+
+        const message = document.getElementById("message");
+        const container = document.getElementById("notifications");
+
+        if (notifications.length === 0) {
+
+            message.innerHTML =
+                "No notifications available.";
+
+            return;
+
+        }
+
+        message.innerHTML = "";
+
+        container.innerHTML = "";
+
+        notifications.forEach(function(notification) {
+
+            container.innerHTML += `
+
+                <div class="notification ${notification.read ? '' : 'unread'}">
+
+                    <p>
+                        <strong>
+                            ${notification.message}
+                        </strong>
+                    </p>
+
+                    <p class="date">
+                        ${notification.notificationDate}
+                    </p>
+
+                    ${
+                        notification.read
+                        ? "<p style='color:green;'>✓ Read</p>"
+                        :
+                        `
+                        <button
+                            class="read-button"
+                            onclick="markRead(${notification.notificationId})">
+                            Mark as Read
+                        </button>
+                        `
+                    }
+
+                </div>
+
+            `;
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("message").innerHTML =
+            "<span style='color:red;'>Unable to load notifications.</span>";
+
+    }
+
+}
+
+async function markRead(id) {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/api/notifications/"
+            + id
+            + "/read",
+            {
+                method: "PUT"
+            }
+        );
+
+        if (response.ok) {
+
+            loadNotifications();
+
+        } else {
+
+            alert("Unable to mark notification as read.");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Backend connection error.");
+
+    }
+
+}
+
+loadNotifications();
+
+</script>
+
+</body>
+
+</html>
